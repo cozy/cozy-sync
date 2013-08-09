@@ -28,60 +28,63 @@ module.exports = class CozyCalDAVBackend
 
     _toICal: (obj) ->
         cal = new VCalendar('cozy', 'my-calendar')
-        cal.add obj.toIcal() #todo : handle user & timezone
+        cal.add obj.toIcal() #todo : handle timezone
         cal.toString()
 
     getCalendarObjects: (calendarId, callback) ->
         objects = []
         async.parallel [
-            (cb) => @Alarm.request 'byId', (err, items) =>
-                console.log 'alarm.all', err, items
-                cb(err?.stack, items)
-            (cb) => @Event.request 'byId', (err, items) =>
-                console.log 'event.all', err, items
-                cb(err?.stack, items)
+            (cb) => @Alarm.all cb
+            (cb) => @Event.all cb
         ], (err, results) =>
             return callback err if err
 
-            objects = results[0].concat results[1]
-
-            objects = objects.map (obj) =>
+            objects = results[0].concat(results[1]).map (obj) =>
                 id:           obj.id
-                uri:          obj.id
+                uri:          obj.caldavuri or (obj.id + '.ics')
                 calendardata: @_toICal(obj)
-                lastmodified: null
+                lastmodified: new Date().getTime()
+
+            console.log "GETCALENDAROBJECTS", objects
 
             callback null, objects
 
     _findCalendarObject: (calendarId, objectUri, callback) ->
-        async.parallel [
-            (cb) => @Alarm.find objectUri, (err, items) =>
-                console.log 'alarm.all', err?.stack, items
-                cb(err?.stack, items)
-            (cb) => @Event.find objectUri, (err, items) =>
-                console.log 'alarm.all', err?.stack, items
-                cb(err?.stack, items)
+
+        async.series [
+            (cb) => @Alarm.byURI objectUri, cb
+            (cb) => @Event.byURI objectUri, cb
         ], (err, results) =>
-            callback err, (results[0] or results[1])
+            object = (results[0]?[0] or results[1]?[0])
+            console.log "GETOBJECT", objectUri, object
+            callback err, object
+
+    # take a calendar object from ICalParser, extract VEvent ot VTodo
+    _extractCalObject: (calendarobj) =>
+        if calendarobj instanceof VEvent or calendarobj instanceof VTodo
+            return calendarobj
+        else
+            for obj in calendarobj.subComponents
+                found = @_extractCalObject obj
+                return found if found
+
+            return false
 
     _parseSingleObjICal: (calendarData, callback) ->
         new ICalParser().parseString calendarData, (err, calendar) =>
             return callback err if err
-            # TODO BE SMARTER
 
-            timezone = calendar.subComponents[0]
-            daylightl = calendar.subComponents[0]
-            callback null, calendar.subComponents[1]
-
+            callback null, @_extractCalObject calendar
 
     getCalendarObject: (calendarId, objectUri, callback) ->
+
         @_findCalendarObject calendarId, objectUri, (err, obj) =>
             return callback err if err
             return callback null, null unless obj
 
             return callback null,
                 id:           obj.id
-                uri:          obj.id
+                uri:          obj.caldavuri or (obj.id + '.ics')
                 calendardata: @_toICal(obj)
                 lastmodified: new Date().getTime()
 
@@ -92,12 +95,14 @@ module.exports = class CozyCalDAVBackend
 
             if obj.name is 'VEVENT'
                 event = @Event.fromIcal obj
+                event.caldavuri = objectUri
                 @Event.create event, (err, event) ->
                     callback err, null
 
             else if obj.name is 'VTODO'
                 console.log "ALARM"
                 alarm = @Alarm.fromIcal obj
+                alarm.caldavuri = objectUri
                 @Alarm.create alarm, (err, alarm) ->
                     callback err, null
 
@@ -106,18 +111,21 @@ module.exports = class CozyCalDAVBackend
 
 
     updateCalendarObject: (calendarId, objectUri, calendarData, callback) ->
-        @_findCalendarObject calendarId, objectUri, (err, oldObj) ->
+        @_findCalendarObject calendarId, objectUri, (err, oldObj) =>
             return callback err if err
 
             @_parseSingleObjICal calendarData, (err, newObj) =>
                 return callback err if err
 
-                if newObj.name is 'VEVENT' and oldObj instanceof Event
+                console.log "UPDATE", newObj.name, oldObj instanceof @Event
+
+                if newObj.name is 'VEVENT' and oldObj instanceof @Event
                     event = @Event.fromIcal newObj
                     oldObj.updateAttributes event, (err, event) ->
+                        console.log "RESULT", err, event
                         callback err, null
 
-                else if newObj.name is 'VTODO' and oldObj instanceof Alarm
+                else if newObj.name is 'VTODO' and oldObj instanceof @Alarm
                     console.log "ALARM"
                     alarm = @Alarm.fromIcal newObj
                     oldObj.updateAttributes alarm, (err, alarm) ->

@@ -2,16 +2,14 @@
 
 module.exports = class PrincipalBackend
 
-    principal = 
+    principal =
         uri:                 'principals/me'
         '{DAV:}displayname': 'cozy owner'
 
     getPrincipalsByPrefix: (prefixPath, callback) ->
-        console.log "getPrincipalsByPrefix", prefixPath
         callback null, [principal]
 
     getPrincipalByPath: (path, callback) ->
-        console.log "getPrincipalByPath", path
         callback null, principal
 
     updatePrincipal: (path, mutations, callback) ->

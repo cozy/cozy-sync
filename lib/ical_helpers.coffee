@@ -72,7 +72,7 @@ module.exports.VAlarm = class VAlarm extends VComponent
     constructor: (date) ->
         super
         @fields =
-            ACTION: 'AUDIO'
+            ACTION: 'DISPLAY'
             REPEAT: '1'
             TRIGGER: @formatIcalDate date
 
@@ -81,12 +81,12 @@ module.exports.VAlarm = class VAlarm extends VComponent
 module.exports.VTodo = class VTodo extends VComponent
     name: 'VTODO'
 
-    constructor: (date, user, description) ->
+    constructor: (date, id, description) ->
         super
         @fields =
             DSTAMP: @formatIcalDate date
             SUMMARY: description
-            UID: user
+            UID: id
 
     addAlarm: (date) ->
         @add new VAlarm date
@@ -95,13 +95,14 @@ module.exports.VTodo = class VTodo extends VComponent
 module.exports.VEvent = class VEvent extends VComponent
     name: 'VEVENT'
 
-    constructor: (startDate, endDate, description, location) ->
+    constructor: (startDate, endDate, id, description, location) ->
         super
         @fields =
             DESCRIPTION: description
             DTSTART: @formatIcalDate startDate
             DTEND: @formatIcalDate endDate
             LOCATION: location
+            UID: id
 
 module.exports.VTimezone = class VTimezone extends VComponent
     name: 'VTIMEZONE'
