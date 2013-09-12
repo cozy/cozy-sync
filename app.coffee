@@ -34,11 +34,10 @@ module.exports = (davServer) ->
 
     # Index page
     app.get '/', (req, res) ->
-        domain = if cozyInstance? then cozyInstance.domain else 'your.cozy.url'
         data =
-            login: davAccount?.login
-            password: davAccount?.password
-            domain: domain
+            login: davAccount?.login       or 'me'
+            password: davAccount?.password or 'Use button below to reset'
+            domain: cozyInstance?.domain   or 'your.cozy.url'
         res.render 'index', data
 
     # Get credentials

@@ -5,6 +5,7 @@ module.exports = WebDAVAccount = db.define 'WebDAVAccount',
     id: String
     login: String
     password: String
+    ctag: Number # used to keep track of changes in the calendar
 
 all = (doc) -> emit doc._id, doc
 WebDAVAccount.defineRequest 'all', all, ->

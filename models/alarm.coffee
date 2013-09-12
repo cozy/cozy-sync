@@ -12,7 +12,7 @@ module.exports = Alarm = db.define 'Alarm',
     related:     type: String, default: null
 
 # Add Ical utilities to Alarm model
-require('cozy-ical/lib/alarm')(Alarm)
+require('cozy-ical').decorateAlarm Alarm
 
 byURI = (doc) -> emit (doc.caldavuri or doc._id + '.ics'), doc
 Alarm.defineRequest 'byURI', byURI, ->

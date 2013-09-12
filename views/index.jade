@@ -8,23 +8,33 @@ html(lang="en")
     script(src='spin.min.js')
     script(src='client.js')
     script(src='app.js')
-    link(rel='stylesheet', href='app.css') 
+    link(rel='stylesheet', href='app.css')
     link(rel='icon', type='image/x-icon', href='/favicon.png')
   body
     #content
-      h1  Cozy CalDAV Server
-      h2 How to use CalDAV
+      h1  Cozy CalDAV/CardDAV Server
+
+      h2 DAV Server URL
       p
-          | Simply connect your calendar application to the following URL: 
+          | Simply connect your client application to the following URL:
           | <br />
-          | https://#{domain}/apps/webdav/public
+          | https://#{domain}/public/webdav/
           | <br />
-          | And use following credentials for authentification parameters.
-      h2  CalDAV Credentials
-      p 
-        | login: 
+
+      h2 CalDAV direct URL
+      p
+          | Some CalDAV clients such as Thunderbird/Lightning
+          | require you to enter the calendar's direct URL :
+          | <br />
+          | https://#{domain}/public/webdav/calendars/me/my-calendar/
+
+      h2  Credentials
+      p Use the following credentials when prompted by your CalDAV/CardDAV client
+      p
+        | login:
         span#login-span #{login}
-      p 
-        | password: 
+      p
+        | password:
         span#password-span #{password}
+
       button#generate-btn Reset Credentials

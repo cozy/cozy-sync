@@ -1,7 +1,9 @@
 "use strict"
 
 Exc = require "jsDAV/lib/shared/exceptions"
+WebdavAccount = require '../models/webdavaccount'
 async = require "async"
+axon = require 'axon'
 time  = require "time"
 {ICalParser, VCalendar, VTimezone, VEvent, VTodo} = require "cozy-ical"
 
@@ -10,11 +12,36 @@ module.exports = class CozyCalDAVBackend
     constructor: (models) ->
         {@Event, @Alarm, @User} = models
 
+        @getLastCtag (err, ctag) =>
+            # we suppose something happened while webdav was down
+            @ctag = ctag + 1
+            @saveLastCtag @ctag
+
+            onChange = =>
+                @ctag = @ctag + 1
+                @saveLastCtag @ctag
+
+            # keep ctag updated
+            socket = axon.socket 'sub-emitter'
+            socket.connect 9105
+            socket.on 'alarm.*', onChange
+            socket.on 'event.*', onChange
+
+    getLastCtag: (callback) ->
+        WebdavAccount.first (err, account) ->
+            callback err, account?.ctag or 0
+
+    saveLastCtag: (ctag, callback = ->) =>
+        WebdavAccount.first (err, account) =>
+            return callback err if err or not account
+            account.updateAttributes ctag: ctag, ->
+
     getCalendarsForUser: (principalUri, callback) ->
         calendar =
             id: 'my-calendar'
             uri: 'my-calendar'
             principaluri: principalUri
+            "{http://calendarserver.org/ns/}getctag": @ctag
             "{DAV:}displayname": 'Cozy Calendar'
         callback null, [calendar]
 
@@ -22,14 +49,14 @@ module.exports = class CozyCalDAVBackend
         callback null, null
 
     updateCalendar: (calendarId, mutations, callback) ->
-        callback null, null
+        callback null, false
 
     deleteCalendar: (calendarId, callback) ->
         callback null, null
 
     _toICal: (obj, timezone) ->
         cal = new VCalendar('cozy', 'my-calendar')
-        cal.add new VTimezone new time.Date(obj.trigg or obj.start), timezone
+        # cal.add new VTimezone new time.Date(obj.trigg or obj.start), timezone
         cal.add obj.toIcal(timezone)
         cal.toString()
 
@@ -120,10 +147,10 @@ module.exports = class CozyCalDAVBackend
             @_parseSingleObjICal calendarData, (err, newObj) =>
                 return callback err if err
 
-                console.log "UPDATE", newObj.name, oldObj instanceof @Event
-
                 if newObj.name is 'VEVENT' and oldObj instanceof @Event
-                    event = @Event.fromIcal newObj
+                    event = @Event.fromIcal(newObj).toObject()
+                    delete event.id
+
                     oldObj.updateAttributes event, (err, event) ->
                         console.log "RESULT", err, event
                         callback err, null
