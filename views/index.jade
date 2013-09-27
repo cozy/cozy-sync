@@ -14,27 +14,43 @@ html(lang="en")
     #content
       h1  Cozy CalDAV/CardDAV Server
 
-      h2 DAV Server URL
-      p
-          | Simply connect your client application to the following URL:
-          | <br />
-          | https://#{domain}/public/webdav/
-          | <br />
-
-      h2 CalDAV direct URL
-      p
-          | Some CalDAV clients such as Thunderbird/Lightning
-          | require you to enter the calendar's direct URL :
-          | <br />
-          | https://#{domain}/public/webdav/calendars/me/my-calendar/
-
       h2  Credentials
       p Use the following credentials when prompted by your CalDAV/CardDAV client
       p
-        | login:
+        | login:&nbsp;
         span#login-span #{login}
       p
-        | password:
+        | password:&nbsp;
         span#password-span #{password}
 
       button#generate-btn Reset Credentials
+
+      h2 URLs
+      p The url to connect to your server depends on your client
+
+      h3 Thunderbird/Lightning
+      p
+        strong CalDAV
+        | Use the following url :
+        | https://#{domain}/public/webdav/calendars/me/my-calendar/
+        <br />
+        strong CardDAV
+        | There is no support for carddav
+
+      h3 iOS
+      p
+        strong CalDAV / CardDAV
+        | In the "Account url" field :
+        | https://#{domain}/public/webdav/principals/me/
+
+      h3 Android
+      p
+        | Android does not support CalDAV/CardDAV natively, you will need
+        | to install an app to manage it. We are still working on it.
+
+      h3 Other ?
+      p
+        | If you use another client and made it work or are exprimenting
+        | problems, please let us know about it&nbsp;
+        a(href="https://github.com/mycozycloud/cozy-webdav/issues") on github.
+
