@@ -10,7 +10,7 @@ module.exports = class CozyCardDAVBackend
     constructor: (@Contact) ->
 
     getAddressBooksForUser: (principalUri, callback) ->
-        book = 
+        book =
             id: 'all-contacts'
             uri: 'all-contacts'
             ctag: 0 # ?
@@ -26,38 +26,52 @@ module.exports = class CozyCardDAVBackend
             callback null, contacts.map (contact) ->
                 lastmodified: 0
                 carddata:     contact.toVCF()
-                uri:          contact.id
+                uri:          contact.getURI()
 
     getCard: (addressBookId, cardUri, callback) ->
-        @Contact.find cardUri, (err, contact) ->
+        @Contact.byURI cardUri, (err, contact) ->
             return callback handle err if err
+            return callback null unless contact.length
 
-            callback null, 
+            contact = contact[0]
+
+            callback null,
                 lastmodified: 0
                 carddata:     contact.toVCF()
-                uri:          contact.id
+                uri:          contact.getURI()
 
     createCard: (addressBookId, cardUri, cardData, callback) ->
-        @Contact.create @Contact.parse(cardData), (err, contact) ->
+        contact = @Contact.parse(cardData)
+        @Contact.create contact, (err, contact) ->
             return callback handle err if err
 
             callback null
 
     updateCard: (addressBookId, cardUri, cardData, callback) ->
-        @Contact.find cardUri, (err, contact) ->
-            return callback handle err if err 
+        @Contact.byURI cardUri, (err, contact) =>
+            return callback handle err if err
+            return callback handle 'Not Found' unless contact.length
 
-            contact.updateAttributes @Contact.parse(cardData), (err, contact) ->
+            contact = contact[0]
+            data = @Contact.parse(cardData)
+
+            console.log "RECEIVED CONTACT", data
+
+            contact.updateAttributes data, (err, contact) ->
                 return callback handle err if err
+
+                console.log "UPDATED", contact
 
                 callback null
 
     deleteCard: (addressBookId, cardUri, callback) ->
 
-        @Contact.find cardUri, (err, contact) ->
+        @Contact.byURI cardUri, (err, contact) ->
             return callback handle err if err
-            
+
+            contact = contact[0]
+
             contact.destroy (err) ->
                 return callback handle err if err
 
-                callback null        
+                callback null

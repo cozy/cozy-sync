@@ -2,11 +2,22 @@ db = require './db'
 
 module.exports = Contact = db.define 'Contact',
     id            : String
+    carddavuri    : String
     fn            : String
     datapoints    : Object
     note          : String
     _attachments  : Object
 
+byURI = (doc) -> emit (doc.carddavuri or doc._id + '.ics'), doc
+Contact.defineRequest 'byURI', byURI, ->
+    console.log 'Contact "byURI" request created'
+
+Contact::getURI = -> @carddavuri or @id + '.ics'
+Contact.byURI = (uri, cb) ->
+    # see alarms for complexity
+    req = Contact.request 'byURI', null, cb
+    req.body = JSON.stringify key: uri
+    req.setHeader 'content-type', 'application/json'
 
 Contact::toVCF = ->
 
@@ -45,15 +56,6 @@ Contact::toVCF = ->
 
     out
 
-Contact::addDP = (name, type, value) ->
-    @datapoints.push
-        type: type
-        name: name
-        value: value
-
-Contact::set = (name, value) ->
-    this[name] = value
-
 AndroidToDP = (contact, raw) ->
     parts = raw.split ';'
     switch parts[0].replace 'vnd.android.cursor.item/', ''
@@ -86,9 +88,16 @@ Contact.parse = (vcf) ->
 
     currentversion = "3.0"
 
+
     current = null
     currentidx = null
     currentdp = null
+
+    addDP = (name, type, value) ->
+        current.datapoints.push
+            type: type
+            name: name
+            value: value
 
     for line in vcf.split /\r?\n/
 
@@ -96,7 +105,7 @@ Contact.parse = (vcf) ->
 
         if regexps.begin.test line
             console.log "b"
-            current = new Contact()
+            current = {}
             current.datapoints = []
 
         else if regexps.end.test line
@@ -120,7 +129,7 @@ Contact.parse = (vcf) ->
                 when 'title', 'org'
                     current.addDP 'about', key, value
                 when 'fn', 'note'
-                    current.set key, value
+                    current[key] = value
                 when 'bday'
                     current.addDP 'about', 'birthday', value
 
