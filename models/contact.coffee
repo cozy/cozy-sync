@@ -8,11 +8,7 @@ module.exports = Contact = db.define 'Contact',
     note          : String
     _attachments  : Object
 
-byURI = (doc) -> emit (doc.carddavuri or doc._id + '.ics'), doc
-Contact.defineRequest 'byURI', byURI, ->
-    console.log 'Contact "byURI" request created'
-
-Contact::getURI = -> @carddavuri or @id + '.ics'
+Contact::getURI = -> @carddavuri or @id + '.vcf'
 Contact.byURI = (uri, cb) ->
     # see alarms for complexity
     req = Contact.request 'byURI', null, cb

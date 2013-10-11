@@ -14,10 +14,6 @@ module.exports = Alarm = db.define 'Alarm',
 # Add Ical utilities to Alarm model
 require('cozy-ical').decorateAlarm Alarm
 
-byURI = (doc) -> emit (doc.caldavuri or doc._id + '.ics'), doc
-Alarm.defineRequest 'byURI', byURI, ->
-    console.log 'Alarm "byURI" request created'
-
 Alarm.all = (cb) -> Alarm.request 'byURI', cb
 Alarm.byURI = (uri, cb) ->
     # this fail in strange way if we let request handle JSON

@@ -47,10 +47,15 @@ DAVServer = jsDAV.mount
 
 
 # Include UI then run server
-app = require('./app')(DAVServer)
+module.exports = app = require('./app')(DAVServer)
 port = process.env.PORT || 9116
-host = process.env.HOST || "0.0.0.0"
+host = process.env.HOST || "127.0.0.1"
 
-app.listen port, host, ->
-    console.log "WebDAV Server listening on %s:%d within %s environment",
-                host, port, app.get('env')
+unless module.parent
+    app.start port, host, (err) ->
+        if err
+            console.log "Not started because : "
+            console.log err
+        else
+            console.log "WebDAV Server listening on %s:%d within %s environment",
+                        host, port, app.get('env')

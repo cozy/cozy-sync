@@ -20,32 +20,40 @@ module.exports = (davServer) ->
         dumpExceptions: true
         showStack: true
 
-    # Init auth account
-    davAccount = null
-    WebDAVAccount.first (err, account) ->
-        if account? then davAccount = account
-        else davAccount = null
+    # Load davaccount and cozy instance on requests
+    app.use (req, res, next) ->
+        WebDAVAccount.first (err, davAccount) ->
+            return next err if err
+            req.davAccount = davAccount
+            CozyInstance.first (err, cozyInstance) ->
+                req.cozyInstance = cozyInstance
+                next err
 
-    # Init Cozy instance
-    cozyInstance = null
-    CozyInstance.first (err, instance) ->
-        if instance? then cozyInstance = instance
-        else cozyInstance = null
+    app.use (req, res, next) ->
+        res.error = (code, msg, err) ->
+            if msg.stack
+                err = msg
+                msg = err.message
+            console.log err.stack if err
+            res.send error: true, msg: msg, code
+
+        next()
+
 
     # Index page
     app.get '/', (req, res) ->
         data =
-            login: davAccount?.login       or 'me'
-            password: davAccount?.password or 'Use button below to reset'
-            domain: cozyInstance?.domain   or 'your.cozy.url'
+            login: req.davAccount?.login       or 'me'
+            password: req.davAccount?.password or 'Use button below to reset'
+            domain: req.cozyInstance?.domain   or 'your.cozy.url'
         res.render 'index', data
 
     # Get credentials
     app.get '/token', (req, res) ->
-        if davAccount?
+        if req.davAccount
             res.send account.toJSON()
         else
-            res.send error: true, msg: 'No webdav account generated', 404
+            res.error 404, 'No webdav account generated'
 
     # Generate credentials
     app.post '/token', (req, res) ->
@@ -53,18 +61,32 @@ module.exports = (davServer) ->
         password = shortId.generate()
         data = login: login, password: password
 
-        if not davAccount?
+        if not req.davAccount
             WebDAVAccount.create data, (err, account) ->
-                if err then res.send error: true, msg: err.toString(), 500
+                if err
+                    res.error 500, err
                 else
-                    davAccount = account
                     res.send success: true, account: account.toJSON()
         else
-            davAccount.login = login
-            davAccount.password = password
-            davAccount.save (err) ->
-                if err then res.send error: true, msg: err.toString(), 500
-                else res.send success: true, account: davAccount.toJSON()
+            req.davAccount.updateAttributes data, (err) ->
+                if err
+                    res.error 500, err
+                else
+                    res.send success: true, account: davAccount.toJSON()
 
-    app
+    app.start = ->
+        initRequests = require './models/requests'
+        args = arguments
+        initRequests (err) ->
+            if err
+                callback = args[args.length-1]
+                return callback err
+            else
+                app.server = app.listen.apply app, args
 
+        return app
+
+    app.close = ->
+        app.server.close()
+
+    return app

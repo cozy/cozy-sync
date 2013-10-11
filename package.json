@@ -18,7 +18,7 @@
   "dependencies": {
     "jsDAV": "git://github.com/aenario/jsDAV.git#caldav",
     "jugglingdb": "~0.2.0-35",
-    "jugglingdb-cozy-adapter": "~0.3.5",
+    "jugglingdb-cozy-adapter": "=0.3.12",
     "async": "~0.2.9",
     "moment": "~2.1.0",
     "lazy": "~1.0.11",
@@ -28,6 +28,11 @@
     "jade": "*",
     "shortid": "~2.0.0",
     "axon": "~1.0.0"
+  },
+  "devDependencies": {
+    "chai": "~1.8.0",
+    "request": "~2.27.0",
+    "xmldoc": "~0.1.2"
   },
   "cozy-permissions": {
     "Alarm": {

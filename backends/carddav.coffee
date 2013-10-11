@@ -42,6 +42,7 @@ module.exports = class CozyCardDAVBackend
 
     createCard: (addressBookId, cardUri, cardData, callback) ->
         contact = @Contact.parse(cardData)
+        contact.carddavuri = cardUri
         @Contact.create contact, (err, contact) ->
             return callback handle err if err
 
@@ -54,13 +55,10 @@ module.exports = class CozyCardDAVBackend
 
             contact = contact[0]
             data = @Contact.parse(cardData)
-
-            console.log "RECEIVED CONTACT", data
+            data.carddavuri = cardUri
 
             contact.updateAttributes data, (err, contact) ->
                 return callback handle err if err
-
-                console.log "UPDATED", contact
 
                 callback null
 

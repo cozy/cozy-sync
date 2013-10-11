@@ -6,10 +6,6 @@ module.exports = CozyInstance = db.define 'CozyInstance',
     domain: String
     locale: String
 
-all = (doc) -> emit doc._id, doc
-CozyInstance.defineRequest 'all', all, ->
-    console.log 'CozyInstance "all" request created'
-
 CozyInstance.first = (callback) ->
     CozyInstance.request 'all', (err, instances) ->
         if err then callback err
