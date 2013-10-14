@@ -32,7 +32,9 @@
   "devDependencies": {
     "chai": "~1.8.0",
     "request": "~2.27.0",
-    "xmldoc": "~0.1.2"
+    "xmldoc": "~0.1.2",
+    "mocha": "~1.13.0",
+    "coffee-script": "latest"
   },
   "cozy-permissions": {
     "Alarm": {

@@ -3,7 +3,7 @@ Exc       = require 'jsDAV/lib/shared/exceptions'
 
 handle    = (err) ->
     console.log err
-    return new Exc err.message || err
+    return new Exc.jsDAV_Exception err.message || err
 
 module.exports = class CozyCardDAVBackend
 

@@ -35,9 +35,12 @@ runTests = (fileList) ->
         command += "--debug --forward-io --profile "
     command += " --reporter spec --compilers coffee:coffee-script --colors"
     exec command, (err, stdout, stderr) ->
+        console.log stdout
         if err
             console.log "Running mocha caught exception: \n" + err
-        console.log stdout
+            process.exit 1
+        else
+            process.exit 0
 
 
 task 'tests', 'run server tests, ./test is parsed by default, otherwise use -f or --dir', (opts) ->

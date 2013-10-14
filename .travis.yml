@@ -19,7 +19,15 @@ before_install:
     - cat forever-ds.log
     - sudo netstat -plunt
     - curl http://localhost:9101/
-    - coffee commands.coffee test-install contacts
+    - coffee commands.coffee test-install webdav
     - cd ..
-    - export NAME=contacts
+    - export NAME=webdav
     - export TOKEN=apptoken
+
+after_install:
+    - cd node_modules/jsDAV
+    - npm install
+    - cd ../..
+
+after_failure:
+    - cat cozy-data-system/forever-ds.log

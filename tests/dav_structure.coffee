@@ -3,12 +3,9 @@ should = require('chai').Should()
 
 describe 'Basic DAV Structure', ->
 
-
+    before require '../models/requests'
     before helpers.cleanDB
     before helpers.startServer
-    # before -> require('eyes').inspect @server
-    # before helpers.closeServer
-    # before helpers.startServer
     before helpers.makeDAVAccount
     after  helpers.closeServer
     after  helpers.cleanDB

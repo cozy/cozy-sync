@@ -5,6 +5,7 @@ Contact = require '../models/contact'
 
 describe 'Carddav support', ->
 
+    before require '../models/requests'
     before helpers.cleanDB
     before helpers.startServer
     before helpers.makeDAVAccount

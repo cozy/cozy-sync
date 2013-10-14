@@ -9,6 +9,7 @@ module.exports = Contact = db.define 'Contact',
     _attachments  : Object
 
 Contact::getURI = -> @carddavuri or @id + '.vcf'
+Contact.all = (cb) -> Contact.request 'byURI', cb
 Contact.byURI = (uri, cb) ->
     # see alarms for complexity
     req = Contact.request 'byURI', null, cb
@@ -97,16 +98,11 @@ Contact.parse = (vcf) ->
 
     for line in vcf.split /\r?\n/
 
-        console.log "LINE : ", line
-
         if regexps.begin.test line
-            console.log "b"
             current = {}
             current.datapoints = []
 
         else if regexps.end.test line
-            console.log "ee"
-            console.log currentdp
             current.datapoints.push currentdp if currentdp
             return current
             currentdp = null
@@ -115,7 +111,6 @@ Contact.parse = (vcf) ->
             currentversion = "3.0"
 
         else if regexps.simple.test line
-            console.log "s"
             [all, key, value] = line.match regexps.simple
 
             key = key.toLowerCase()
@@ -135,7 +130,6 @@ Contact.parse = (vcf) ->
                 AndroidToDP current, value
 
         else if regexps.composedkey.test line
-            console.log "ck"
             [all, itemidx, part, value] = line.match regexps.composedkey
 
             if currentidx is null or currentidx isnt itemidx
@@ -175,7 +169,6 @@ Contact.parse = (vcf) ->
                 currentdp.value = value.replace "\\:", ":"
 
         else if regexps.complex.test line
-            console.log "cpx"
             [all, key, properties, value] = line.match regexps.complex
 
             current.datapoints.push currentdp if currentdp
@@ -213,8 +206,6 @@ Contact.parse = (vcf) ->
                     currentdp[pname.toLowerCase()] = pvalue.toLowerCase()
 
             currentdp.value = value
-
-            console.log currentdp
 
 
     return imported

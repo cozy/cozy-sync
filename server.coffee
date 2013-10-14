@@ -1,5 +1,5 @@
 jsDAV = require "jsDAV"
-jsDAV.debugMode = true
+jsDAV.debugMode = true unless process.env.NODE_ENV is 'test'
 
 
 # Auth

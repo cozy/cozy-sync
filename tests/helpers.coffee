@@ -4,15 +4,11 @@ PASSWORD = 'test'
 request = require 'request'
 async   = require 'async'
 
-longjohn = require 'longjohn'
-longjohn.async_trace_limit = -1
-
 exports.TESTPORT = TESTPORT
 
 
 exports.startServer = (done) ->
     @timeout 5000
-    require('jsDAV').debugMode = false
     @server = require('../server')
     @server.start TESTPORT, done
 
