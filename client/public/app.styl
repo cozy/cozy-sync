@@ -44,9 +44,27 @@ h1
     border-bottom: 1px solid #CCC
 
 h2
-   margin-top: 50px
-   background: #77A
-   font-size: 26px
+    margin-top: 50px
+    background: #77A
+    font-size: 26px
+
+    &.tab
+        display inline-block
+        border-radius 0
+        border-right 1px solid #fff
+
+        &.selected
+        &:hover
+            background #77A - 20%
+
+.caldavconf
+.carddavconf
+    display block
+
+.caldavconf ~ .caldavconf
+.carddavconf ~ .carddavconf
+    display none
+
 
 h3
     margin-top:30px

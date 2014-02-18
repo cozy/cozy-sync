@@ -1,0 +1,108 @@
+doctype 5
+html(lang="en")
+  head
+    meta(name="viewport", content="width=device-width,initial-scale=1")
+    meta(http-equiv="content-type", content="text/html; charset=utf-8")
+    title Cozy - WebDAV
+    script(src='jquery-1.8.2.js')
+    script(src='spin.min.js')
+    script(src='client.js')
+    script(src='app.js')
+    link(rel='stylesheet', href='app.css')
+    link(rel='icon', type='image/x-icon', href='/favicon.png')
+  body
+    #content
+
+      h1 WebDAV: CalDAV et CardDAV
+      p
+        | WebDav est un protocole standard qui permet à n'importe quel périphérique
+        | (qui le supporte) de synchroniser les contacts, le calendrier et les fichiers
+        | avec votre Cozy. Si vous voulez que les contacts et le calendrier de
+        | votre smartphone soient synchronisés avec votre Cozy (et vice-versa !)
+        |, vous trouverez les étapes de configuration sur cette page.
+
+      h1 Identifiants du serveur
+      p
+        | Avant d'aller plus loin, vous devez générez des identifiants spécifiques
+        | pour l'application afin de ne pas laisser vos données en libre accès.
+        | Ces identifiants seront utilisés par vos périphériques à synchroniser
+        | pour se connecter à votre Cozy en votre nom.
+
+      .url.credentials
+        p
+          | Nom d'utilisateur:&nbsp;
+          span#login-span #{login}
+        p
+          | Mot de passe:&nbsp;
+          span#password-span #{password}
+
+        button#generate-btn réinitialisation le mot de passe
+
+      h1 Configuration de CalDav (Calendrier)
+      p
+        | Lors du processus de configuration, votre smartphone va vous demander d'entrer une URL
+        | sur laquelle se connecter, voici les différentes adresses en fonction
+        | de votre téléphone ou application.
+
+      h2.tab.caldav.selected(data-device="ios") iOS
+      h2.tab.caldav(data-device="android") Android
+      h2.tab.caldav(data-device="thunderbird") Thunderbird (Lightning)
+
+      .caldavconf(data-device="ios")
+        p
+          | Dans le champ "Serveur", écrivez :
+        p.url
+          | #{domain}/public/webdav/principals/me
+
+      .caldavconf(data-device="android")
+        p
+          | Pour synchroniser le calendrier de votre téléphone Android, vous
+          | devez installer une application dédiée. (faites une recherche sur
+          | Google Play avec le mot-clé "caldav"). L'URL à utiliser dépend de
+          | cette application, mais vous pouvez essayer la suivante par défaut :
+        p.url
+          | https://#{domain}/public/webdav/principals/me/
+
+      .caldavconf(data-device="thunderbird")
+        p
+          | Utilisez l'URL suivante :
+        p.url
+          | https://#{domain}/public/webdav/calendars/me/my-calendar/
+
+
+      h1 Configuration de CardDav (Contacts)
+      p
+        | Lors du processus de configuration, votre smartphone va vous demander d'entrer une URL
+        | sur laquelle se connecter, voici les différentes adresses en fonction
+        | de votre téléphone ou application.
+      h2.tab.carddav.selected(data-device="ios") iOS
+      h2.tab.carddav(data-device="android") Android
+
+      .carddavconf(data-device="ios")
+        p
+          | Dans le champ "Serveur", écrivez :
+        p.url
+          | #{domain}/public/webdav
+
+      .carddavconf(data-device="android")
+        p
+          | Pour synchroniser les contacts de votre téléphone Android, vous
+          | devez installer une application dédiée. (faites une recherche sur
+          | Google Play avec le mot-clé "carddav"). L'URL à utiliser dépend de
+          | cette application, mais vous pouvez essayer la suivante par défaut :
+        p.url
+          | https://#{domain}/public/webdav/principals/me/
+
+      h1 Configuration de WebDav (Fichiers)
+      p
+        | Cozy ne supporte pas la synchronisation de fichiers à travers WebDav.
+        | Nous allons fournir une autre façon de synchroniser vos fichiers
+        | avec une application Cozy et des logiciels pour les différents systèmes
+        | d'exploitation et téléphones.
+
+      h1 Trouble Shootings
+      p
+        | Si vous rencontrez des problèmes, faites le nos savoir&nbsp;
+        a(target="_blank", href="https://github.com/mycozycloud/cozy-webdav/issues") sur Github !
+
+

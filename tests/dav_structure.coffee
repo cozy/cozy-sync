@@ -3,7 +3,7 @@ should = require('chai').Should()
 
 describe 'Basic DAV Structure', ->
 
-    before require '../models/requests'
+    #before require '../server/models/requests'
     before helpers.cleanDB
     before helpers.startServer
     before helpers.makeDAVAccount

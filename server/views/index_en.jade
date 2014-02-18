@@ -38,52 +38,58 @@ html(lang="en")
 
         button#generate-btn reset password
 
-      h1 CalDAV urls (Calendar)
+      h1 CalDAV configuration (Calendar)
       p
         | Your client will ask for an url on which to connect, here are the
         | required ones, depending on your phone or software.
 
-      h2 iOS
-      p
-        | In the "Server" field, type:
-      p.url
-        | #{domain}/public/webdav/principals/me
+      h2.tab.caldav.selected(data-device="ios") iOS
+      h2.tab.caldav(data-device="android") Android
+      h2.tab.caldav(data-device="thunderbird") Thunderbird (Lightning)
 
-      h2 Android
-      p
-        | To sync your android phone with CalDAV, you have
-        | to install a dedicated app. The required url depend of that app. But
-        | you can try that one by default:
-      p.url
-        | https://#{domain}/public/webdav/principals/me/
+      .caldavconf(data-device="ios")
+        p
+          | In the "Server" field, type:
+        p.url
+          | #{domain}/public/webdav/principals/me
 
-      h2 Thunderbird (Lightning)
-      p
-        | Use the following url:
-      p.url
-        | https://#{domain}/public/webdav/calendars/me/my-calendar/
+      .caldavconf(data-device="android")
+        p
+          | To sync your android phone with CalDAV, you have
+          | to install a dedicated app. The required url depend of that app. But
+          | you can try that one by default:
+        p.url
+          | https://#{domain}/public/webdav/principals/me/
+
+      .caldavconf(data-device="thunderbird")
+        p
+          | Use the following url:
+        p.url
+          | https://#{domain}/public/webdav/calendars/me/my-calendar/
 
 
-      h1 CardDAV urls (Contacts)
+      h1 CardDAV configuration (Contacts)
       p
         | Your client will ask for an url on which to connect, here are the
         | required ones, depending on your phone or software.
-      h2 iOS
-      p
-        | In the "Server" field, type:
-      p.url
-        | #{domain}/public/webdav
-      p
+      h2.tab.carddav.selected(data-device="ios") iOS
+      h2.tab.carddav(data-device="android") Android
 
-      h2 Android
-      p
-        | To sync your android phone with CardDAV, you have
-        | to install a dedicated app. The required url depend of your app. But
-        | you can try that one by default:
-      p.url
-        | https://#{domain}/public/webdav/principals/me/
+      .carddavconf(data-device="ios")
+        p
+          | In the "Server" field, type:
+        p.url
+          | #{domain}/public/webdav
 
-      h1 WebDAV urls (files)
+      .carddavconf(data-device="android")
+        p
+          | To sync your android phone with CardDAV, you have
+          | to install a dedicated app. The required url depend of your app. But
+          | you can try that one by default:
+        p.url
+          | https://#{domain}/public/webdav/principals/me/
+
+      h1 WebDAV configuration (Files)
       p
         | Cozy doesn't support file synchronization through WebDAV. We will
         | provide soon another way to do it. It will support offline working

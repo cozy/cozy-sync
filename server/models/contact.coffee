@@ -1,7 +1,8 @@
-db = require './db'
+americano = require 'americano-cozy'
 VCardParser = require 'cozy-vcard'
 
-module.exports = Contact = db.define 'Contact',
+
+module.exports = Contact = americano.getModel 'Contact',
     id            : String
     carddavuri    : String
     fn            : String

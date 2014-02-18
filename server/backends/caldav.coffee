@@ -2,6 +2,9 @@
 
 Exc = require "cozy-jsdav-fork/lib/shared/exceptions"
 SCCS = require "cozy-jsdav-fork/lib/CalDAV/properties/supportedCalendarComponentSet"
+CalendarQueryParser = require('cozy-jsdav-fork/lib/CalDAV/calendarQueryParser')
+VObject_Reader = require('cozy-jsdav-fork/lib/VObject/reader')
+CalDAV_CQValidator = require('cozy-jsdav-fork/lib/CalDAV/calendarQueryValidator')
 WebdavAccount = require '../models/webdavaccount'
 async = require "async"
 axon = require 'axon'
@@ -10,8 +13,7 @@ time  = require "time"
 
 module.exports = class CozyCalDAVBackend
 
-    constructor: (models) ->
-        {@Event, @Alarm, @User} = models
+    constructor: (@Event, @Alarm, @User) ->
 
         @getLastCtag (err, ctag) =>
             # we suppose something happened while webdav was down
@@ -172,4 +174,32 @@ module.exports = class CozyCalDAVBackend
             obj.destroy callback
 
     calendarQuery: (calendarId, filters, callback) ->
-        callback Exc.notImplementedYet()
+        objects = []
+        reader = VObject_Reader.new()
+        validator = CalDAV_CQValidator.new()
+        async.parallel [
+            (cb) => @Alarm.all cb
+            (cb) => @Event.all cb
+            (cb) => @User.getTimezone cb
+        ], (err, results) =>
+            return callback err if err
+
+            [alarms, events, timezone] = results
+
+            try
+
+                for jugglingObj in alarms.concat events
+                    # @TODO convert directly from juggling to VObject
+                    vobj = reader.read ical = @_toICal jugglingObj, timezone
+                    if validator.validate vobj, filters
+                        uri = jugglingObj.caldavuri or (jugglingObj.id + '.ics')
+                        objects.push
+                            id:           jugglingObj.id
+                            uri:          uri
+                            calendardata: ical
+                            lastmodified: new Date().getTime()
+
+            catch ex
+                return callback ex, []
+
+            callback null, objects

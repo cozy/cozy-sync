@@ -1,7 +1,7 @@
-db = require './db'
+americano = require 'americano-cozy'
 
 # Object required to store the automatically generated webdav credentials.
-module.exports = WebDAVAccount = db.define 'WebDAVAccount',
+module.exports = WebDAVAccount = americano.getModel 'WebDAVAccount',
     id: String
     login: String
     password: String

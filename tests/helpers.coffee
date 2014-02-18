@@ -3,22 +3,55 @@ PASSWORD = 'test'
 
 request = require 'request'
 async   = require 'async'
+americano = require 'americano'
 
 exports.TESTPORT = TESTPORT
 
-
 exports.startServer = (done) ->
+    console.log "WE TRY TO START"
     @timeout 5000
-    @server = require('../server')
-    @server.start TESTPORT, done
+    options =
+        port: TESTPORT
+        name: "Test Contacts"
+    americano.start options, (app, server) =>
+        @server = server
+        done()
+
+exports.prepareForCrypto = (done) ->
+    # don't want to include bcrypt
+    clear = "password"
+    salt = "th00ee2l2w23ayvi2njpwm1n"
+    hash = "$2a$10$sKO5HTT58LhMFywFKLKFx.//q.MzNwwlLvdKVBePP4P8uv7igimD6"
+
+    request.post
+        url: 'http://localhost:9101/user/'
+        auth: user: 'proxy', pass: 'token'
+        json:
+            email: 'test@example.com'
+            owner: true
+            salt: salt
+            password: hash
+            timezone: 'Europe/Paris'
+    , (err, res, user) ->
+        console.log "USER CREATION ERRROR : ", err, user
+        request.post
+            url: 'http://localhost:9101/accounts/password/'
+            json: password: clear
+        , (err, res, result) ->
+            console.log "KEYS INIT ERRROR", err, result
+            done err
 
 exports.makeDAVAccount = (done) ->
-    WebDAVAccount = require('../models/webdavaccount')
-    data = login: 'me', password: PASSWORD
-    WebDAVAccount.create data, done
+    exports.prepareForCrypto (err) ->
+        if err
+            console.log "FAIL TO PREPARE CRYPTO", err
+            return done err
+        WebDAVAccount = require '../server/models/webdavaccount'
+        data = login: 'me', password: PASSWORD
+        WebDAVAccount.create data, done
 
 exports.createContact = (name) -> (done) ->
-    Contact = require('../models/contact')
+    Contact = require '../server/models/contact'
     sampleaddress = 'Box3;Suite215;14 Avenue de la République;Compiègne;Picardie;60200;France'
     data =
         fn: name
@@ -35,9 +68,9 @@ exports.createContact = (name) -> (done) ->
         done err
 
 exports.createEvent = (title, description, start) -> (done) ->
-    Event = require('../models/event')
-    start = new Date(2013, 11, start, 10, 0, 0)
-    end = new Date(start.getTime() + 7200000)
+    Event = require '../server/models/event'
+    start = new Date 2013, 11, start, 10, 0, 0
+    end = new Date start.getTime() + 7200000
     data =
         start:       start.toString()
         end:         end.toString()
@@ -50,6 +83,11 @@ exports.createEvent = (title, description, start) -> (done) ->
         @events[title] = doc
         done err
 
+exports.createRequests = (done) ->
+    root = require('path').join __dirname, '..'
+    require('americano-cozy').configure root, null, (err) ->
+        exports.createRequests = (cb) -> cb()
+        done err
 
 
 exports.cleanDB = (done) ->
@@ -61,19 +99,20 @@ exports.cleanDB = (done) ->
         'contact':       'byURI'
         'webdavaccount': 'all'
         'user':          'all'
-        'cozy_instance': 'all'
+        'cozyinstance':  'all'
 
     ops = []
 
-    addOp = (model, requestname) ->
-        ops.push (cb) ->
-            model = require("../models/#{model}")
-            model.requestDestroy requestname, cb
-
     for model, requestname of models
-            addOp model, requestname
+        do (model, requestname) ->
+            ops.push (cb) ->
+                model = require "../server/models/#{model}"
+                model.requestDestroy requestname, cb
 
-    async.series ops, done
+    exports.createRequests (err) ->
+        console.log "WE GET HERE"
+        return done err if err
+        async.series ops, done
 
 exports.closeServer = (done) ->
     @server.close()

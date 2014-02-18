@@ -64,3 +64,18 @@ $ ->
                 button.endLoading()
             error: (err) ->
                 button.endLoading()
+
+    # menu management
+    $('.tab.caldav').click ->
+        $('.tab.caldav.selected').removeClass 'selected'
+        $('.caldavconf:visible').hide()
+        $(this).addClass 'selected'
+        device = $(this).data 'device'
+        $(".caldavconf[data-device='#{device}']").show()
+
+    $('.tab.carddav').click ->
+        $('.tab.carddav.selected').removeClass 'selected'
+        $('.carddavconf:visible').hide()
+        $(this).addClass 'selected'
+        device = $(this).data 'device'
+        $(".carddavconf[data-device='#{device}']").show()

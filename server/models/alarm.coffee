@@ -1,8 +1,7 @@
-db = require './db'
-
+americano = require 'americano-cozy'
 
 # ALARM
-module.exports = Alarm = db.define 'Alarm',
+module.exports = Alarm = americano.getModel 'Alarm',
     id:          String
     caldavuri:   String
     trigg:       String
