@@ -67,6 +67,7 @@ module.exports =
                     troubleshouting: localizationManager.t 'troubleshooting'
                     problems: localizationManager.t 'experimenting problems'
                     github: localizationManager.t 'on github'
+                    calendar: localizationManager.t 'calendar'
 
 
                 fileName = getTemplateName locale
