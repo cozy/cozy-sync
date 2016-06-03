@@ -23,6 +23,7 @@ module.exports = Event = cozydb.getModel 'Event',
     created     : type: String
     lastModification: type: String
     mozLastack : type: String # Lightning saves here when he display reminders.
+    uid: String
 
 # Add Ical utilities to Event model
 require('cozy-ical').decorateEvent Event
