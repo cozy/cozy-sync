@@ -6,6 +6,7 @@ CozyInstance = require '../models/cozyinstance'
 Event = require '../models/event'
 localizationManager = require '../helpers/localization_manager'
 log = require('printit')
+    date: true
     prefix: 'account:controller'
 
 # Get the template name for given locale, fallbacks to english template

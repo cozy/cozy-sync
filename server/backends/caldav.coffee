@@ -13,6 +13,7 @@ time  = require "time"
 {ICalParser, VCalendar, VTimezone, VEvent} = require "cozy-ical"
 
 log = require('printit')
+    date: true
     prefix: 'caldav:backend'
 
 module.exports = class CozyCalDAVBackend

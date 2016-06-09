@@ -1,5 +1,6 @@
 cozydb = require 'cozydb'
 log = require('printit')
+    date: true
     prefix: 'user:model'
 
 module.exports = User = cozydb.getModel 'User',
