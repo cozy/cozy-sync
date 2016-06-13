@@ -6,6 +6,7 @@ cozydb = require('cozydb');
 shortId = require('shortid');
 
 log = require('printit')({
+  date: true,
   prefix: 'webdavaccount:model'
 });
 

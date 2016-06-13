@@ -4,6 +4,7 @@ var Tag, cozydb, log;
 cozydb = require('cozydb');
 
 log = require('printit')({
+  date: true,
   prefix: 'tag:model'
 });
 

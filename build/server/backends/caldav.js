@@ -26,6 +26,7 @@ time = require("time");
 ref = require("cozy-ical"), ICalParser = ref.ICalParser, VCalendar = ref.VCalendar, VTimezone = ref.VTimezone, VEvent = ref.VEvent;
 
 log = require('printit')({
+  date: true,
   prefix: 'caldav:backend'
 });
 

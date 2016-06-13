@@ -10,6 +10,7 @@ Exc = require('cozy-jsdav-fork/lib/shared/exceptions');
 WebdavAccount = require('../models/webdavaccount');
 
 log = require('printit')({
+  date: true,
   prefix: 'carddav:backend'
 });
 

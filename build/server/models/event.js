@@ -60,7 +60,8 @@ module.exports = Event = cozydb.getModel('Event', {
   },
   mozLastack: {
     type: String
-  }
+  },
+  uid: String
 });
 
 require('cozy-ical').decorateEvent(Event);

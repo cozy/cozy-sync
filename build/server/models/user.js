@@ -4,6 +4,7 @@ var User, cozydb, log;
 cozydb = require('cozydb');
 
 log = require('printit')({
+  date: true,
   prefix: 'user:model'
 });
 

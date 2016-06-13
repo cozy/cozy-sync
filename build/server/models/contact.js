@@ -12,6 +12,7 @@ WritableStream = require('stream').Writable;
 VCardParser = require('cozy-vcard');
 
 log = require('printit')({
+  date: true,
   prefix: 'model:contact'
 });
 

@@ -16,6 +16,7 @@ Event = require('../models/event');
 localizationManager = require('../helpers/localization_manager');
 
 log = require('printit')({
+  date: true,
   prefix: 'account:controller'
 });
 
@@ -86,7 +87,8 @@ module.exports = {
           file: localizationManager.t('doesn\'t support file'),
           troubleshouting: localizationManager.t('troubleshooting'),
           problems: localizationManager.t('experimenting problems'),
-          github: localizationManager.t('on github')
+          github: localizationManager.t('on github'),
+          calendar: localizationManager.t('calendar')
         };
         fileName = getTemplateName(locale);
         return res.render(fileName, data);
