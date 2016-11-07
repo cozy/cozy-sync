@@ -99,6 +99,7 @@ module.exports = class CozyCardDAVBackend
 
     createCard: (addressBookId, cardUri, cardData, callback) ->
         data = @Contact.parse cardData
+        data.id ?= cardUri.split('.')[0]
         data.carddavuri = cardUri
         data.addTag addressBookId unless addressBookId is allContactsId
         @Contact.create data, (err, contact) ->
@@ -114,6 +115,7 @@ module.exports = class CozyCardDAVBackend
 
             contact = contact[0]
             data = @Contact.parse cardData
+            data.id ?= cardUri.split('.')[0]
             data.carddavuri = cardUri
             data.addTag addressBookId unless addressBookId is allContactsId
 
